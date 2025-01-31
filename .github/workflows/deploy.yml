@@ -3,15 +3,15 @@ name: Build and Deploy to AKS
 on:
   push:
     branches:
-      - main
+      - main  # Trigger workflow on push to the main branch
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # This job will run on an Ubuntu-based runner
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2  # Checkout the repository code
 
       # Set up Java using Temurin (Adoptium's updated distribution name)
       - name: Set up Java
@@ -25,6 +25,7 @@ jobs:
       - name: Build with Maven
         run: mvn clean install  # Ensure the target/ems-backend-0.0.1-SNAPSHOT.jar file is created
 
+      # List target directory for verification
       - name: List target directory for verification
         run: ls -l target/  # Verify the JAR file is generated
 
@@ -33,33 +34,33 @@ jobs:
         uses: azure/docker-login@v2
         with:
           login-server: emsregistery.azurecr.io
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          username: ${{ secrets.ACR_USERNAME }}  # Use GitHub Secrets for ACR username
+          password: ${{ secrets.ACR_PASSWORD }}  # Use GitHub Secrets for ACR password
 
       # Build and push Docker image
       - name: Build and push Docker image
         run: |
-          IMAGE_TAG=$(git rev-parse --short HEAD)
-          docker build -t emsregistery.azurecr.io/dhanasekhar716/backendss:$IMAGE_TAG .
-          docker push emsregistery.azurecr.io/dhanasekhar716/backendss:$IMAGE_TAG
+          IMAGE_TAG=$(git rev-parse --short HEAD)  # Create an image tag based on the commit hash
+          docker build -t emsregistery.azurecr.io/dhanasekhar716/backendss:$IMAGE_TAG .  # Build Docker image
+          docker push emsregistery.azurecr.io/dhanasekhar716/backendss:$IMAGE_TAG  # Push the image to ACR
 
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
+    needs: build  # This job depends on the build job being successful
+    runs-on: ubuntu-latest  # This job will run on an Ubuntu-based runner
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2  # Checkout the repository code
 
+      # Set up kubectl
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
         with:
-          kubeconfig: ${{ secrets.AKS_KUBECONFIG }}
+          kubeconfig: ${{ secrets.AKS_KUBECONFIG }}  # Use GitHub Secrets for AKS kubeconfig
 
       # Deploy to AKS
       - name: Deploy to AKS
         run: |
-          kubectl apply -f ./k8s/deployment.yaml --validate=false
-          kubectl apply -f ./k8s/service.yaml --validate=false
-          kubectl rollout status deployment/backend-deployment
-
+          kubectl apply -f ./k8s/deployment.yaml --validate=false  # Apply the deployment YAML
+          kubectl apply -f ./k8s/service.yaml --validate=false  # Apply the service YAML
+          kubectl rollout status deployment/backend-deployment  # Wait for the deployment to finish
