@@ -13,12 +13,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up Java (with the correct distribution)
+      # Set up Java (using the Adoptium distribution)
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          java-version: '23'
-          distribution: 'adoptopenjdk'  # You can change this to 'zulu', 'oraclejdk', etc.
+          java-version: '23'  # Specify the version you need
+          distribution: 'adoptium'  # Corrected distribution name
+          java-package: 'jdk'
 
       # Build the application using Maven
       - name: Build with Maven
@@ -52,4 +53,5 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           kubectl rollout status deployment/your-deployment-name
+
 
