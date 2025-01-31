@@ -61,13 +61,16 @@ jobs:
       # Debug kubectl configuration to ensure proper setup
       - name: Debug kubectl configuration
         run: |
+          echo "Kubeconfig contents:"
+          cat $HOME/.kube/config  # Output the kubeconfig file for debugging
+          kubectl config get-contexts  # List available contexts
           kubectl config current-context  # Output the current context
           kubectl cluster-info  # Output cluster info to verify connectivity
 
-      # Set kubectl context explicitly (optional but helpful for debugging)
+      # Set kubectl context explicitly (if it's not correctly set)
       - name: Set kubectl context
         run: |
-          kubectl config use-context DhanaaAKSCluster  # Replace with your actual AKS context name
+          kubectl config use-context DhanaaAKSCluster || echo "Context 'DhanaaAKSCluster' not found in kubeconfig."  # Replace with your actual AKS context name
 
       # Deploy to AKS
       - name: Deploy to AKS
@@ -75,4 +78,5 @@ jobs:
           kubectl apply -f ./k8s/deployment.yaml --validate=false  # Apply the deployment YAML
           kubectl apply -f ./k8s/service.yaml --validate=false  # Apply the service YAML
           kubectl rollout status deployment/backend-deployment  # Wait for the deployment to finish
+
 
