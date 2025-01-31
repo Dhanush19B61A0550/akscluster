@@ -61,14 +61,14 @@ jobs:
       # Debug kubectl configuration to ensure proper setup
       - name: Debug kubectl configuration
         run: |
-          echo "Kubeconfig contents:"
-          echo "${{ secrets.AKS_KUBECONFIG }}"  # Print the kubeconfig content to verify it is loaded correctly
-          echo "${{ secrets.AKS_KUBECONFIG }}" > $GITHUB_WORKSPACE/kubeconfig.yaml  # Save it explicitly to a file
+          echo "Kubeconfig loaded."
+          echo "${{ secrets.AKS_KUBECONFIG }}" > $GITHUB_WORKSPACE/kubeconfig.yaml  # Save kubeconfig to a file
           export KUBECONFIG=$GITHUB_WORKSPACE/kubeconfig.yaml  # Explicitly set KUBECONFIG environment variable
           kubectl config current-context  # Output the current context
           kubectl cluster-info  # Output cluster info to verify connectivity
           kubectl get nodes  # List nodes to ensure connectivity
           kubectl get namespaces  # List namespaces to ensure connectivity
+          kubectl config get-contexts  # List all contexts to ensure the correct one is set
 
       # Set kubectl context explicitly (if it's not correctly set)
       - name: Set kubectl context
@@ -82,3 +82,9 @@ jobs:
           kubectl apply -f ./k8s/deployment.yaml --validate=false  # Apply the deployment YAML
           kubectl apply -f ./k8s/service.yaml --validate=false  # Apply the service YAML
           kubectl rollout status deployment/backend-deployment  # Wait for the deployment to finish
+
+      # Verify the deployment and pod status after applying
+      - name: Verify Pods and Deployments
+        run: |
+          kubectl get pods  # List all pods
+          kubectl describe deployment backend-deployment  # Describe the deployment for more details
