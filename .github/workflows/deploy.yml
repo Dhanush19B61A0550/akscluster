@@ -13,13 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up Java (if it's a Java-based project, adjust as needed)
+      # Set up Java (with the correct distribution)
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          java-version: '23'  # Use your Java version here
+          java-version: '23'
+          distribution: 'adoptopenjdk'  # You can change this to 'zulu', 'oraclejdk', etc.
 
-      # Build the application using Maven (or Gradle, adjust as necessary)
+      # Build the application using Maven
       - name: Build with Maven
         run: mvn clean install  # Ensure the target/ems-backend-0.0.1-SNAPSHOT.jar file is created
 
@@ -51,5 +52,4 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           kubectl rollout status deployment/your-deployment-name
-
 
