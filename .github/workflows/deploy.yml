@@ -81,3 +81,4 @@ jobs:
           kubectl apply -f ./k8s/service.yaml --validate=false  # Apply the service YAML
           kubectl rollout status deployment/backend-deployment  # Wait for the deployment to finish
 
+
