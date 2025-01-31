@@ -68,10 +68,12 @@ jobs:
           kubectl config current-context  # Output the current context
           kubectl cluster-info  # Output cluster info to verify connectivity
           kubectl get nodes  # List nodes to ensure connectivity
+          kubectl get namespaces  # List namespaces to ensure connectivity
 
       # Set kubectl context explicitly (if it's not correctly set)
       - name: Set kubectl context
         run: |
+          export KUBECONFIG=$GITHUB_WORKSPACE/kubeconfig.yaml
           kubectl config use-context DhanaaAKSCluster || echo "Context 'DhanaaAKSCluster' not found in kubeconfig."  # Replace with your actual AKS context name
 
       # Deploy to AKS
@@ -80,5 +82,3 @@ jobs:
           kubectl apply -f ./k8s/deployment.yaml --validate=false  # Apply the deployment YAML
           kubectl apply -f ./k8s/service.yaml --validate=false  # Apply the service YAML
           kubectl rollout status deployment/backend-deployment  # Wait for the deployment to finish
-
-
