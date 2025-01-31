@@ -13,8 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Debugging step removed for security reasons
-      
+      # Set up Java (if it's a Java-based project, adjust as needed)
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '23'  # Use your Java version here
+
+      # Build the application using Maven (or Gradle, adjust as necessary)
+      - name: Build with Maven
+        run: mvn clean install  # Ensure the target/ems-backend-0.0.1-SNAPSHOT.jar file is created
+
       - name: Log in to Azure Container Registry
         uses: azure/docker-login@v2
         with:
@@ -43,4 +51,5 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           kubectl rollout status deployment/your-deployment-name
+
 
