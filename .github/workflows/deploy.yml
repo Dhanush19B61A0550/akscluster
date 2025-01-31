@@ -53,13 +53,17 @@ jobs:
         with:
           kubeconfig: ${{ secrets.AKS_KUBECONFIG }}
 
-      # List the k8s directory contents for verification
-      - name: List k8s directory files for verification
-        run: ls -l ./k8s/
+      # Debug step to verify repository contents
+      - name: Verify repository contents
+        run: |
+          echo "Listing root directory:"
+          ls -l
+          echo "Listing k8s directory:"
+          ls -l ./k8s/
 
+      # Deploy to AKS
       - name: Deploy to AKS
         run: |
           kubectl apply -f ./k8s/deployment.yaml
           kubectl apply -f ./k8s/service.yaml
           kubectl rollout status deployment/backend-deployment
-
