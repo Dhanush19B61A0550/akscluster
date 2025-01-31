@@ -62,8 +62,9 @@ jobs:
       - name: Debug kubectl configuration
         run: |
           echo "Kubeconfig contents:"
-          cat $HOME/.kube/config  # Output the kubeconfig file for debugging
-          kubectl config get-contexts  # List available contexts
+          echo "${{ secrets.AKS_KUBECONFIG }}"  # Print the kubeconfig content to verify it is loaded correctly
+          echo "${{ secrets.AKS_KUBECONFIG }}" > $GITHUB_WORKSPACE/kubeconfig.yaml  # Save it explicitly to a file
+          export KUBECONFIG=$GITHUB_WORKSPACE/kubeconfig.yaml  # Explicitly set KUBECONFIG environment variable
           kubectl config current-context  # Output the current context
           kubectl cluster-info  # Output cluster info to verify connectivity
 
@@ -78,5 +79,3 @@ jobs:
           kubectl apply -f ./k8s/deployment.yaml --validate=false  # Apply the deployment YAML
           kubectl apply -f ./k8s/service.yaml --validate=false  # Apply the service YAML
           kubectl rollout status deployment/backend-deployment  # Wait for the deployment to finish
-
-
