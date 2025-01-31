@@ -56,6 +56,7 @@ jobs:
       # Deploy to AKS
       - name: Deploy to AKS
         run: |
-          kubectl apply -f /path/to/akscluster/k8s/deployment.yaml
-          kubectl apply -f /path/to/akscluster/k8s/service.yaml
+          kubectl apply -f C:\Users\MTL1027\Desktop\updated-backend-main\k8s\deployment.yaml
+          kubectl apply -f C:\Users\MTL1027\Desktop\updated-backend-main\k8s\service.yaml
           kubectl rollout status deployment/backend-deployment
+
