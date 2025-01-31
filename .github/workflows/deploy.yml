@@ -43,62 +43,29 @@ jobs:
           docker build -t emsregistery.azurecr.io/dhanasekhar716/backendss:$IMAGE_TAG .
           docker push emsregistery.azurecr.io/dhanasekhar716/backendss:$IMAGE_TAG
 
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Set up kubectl
-  #       uses: azure/setup-kubectl@v1
-  #       with:
-  #         kubeconfig: ${{ secrets.AKS_KUBECONFIG }}
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          kubeconfig: ${{ secrets.AKS_KUBECONFIG }}
 
-  #     # Debug step to verify repository contents
-  #     - name: Verify repository contents
-  #       run: |
-  #         echo "Listing root directory:"
-  #         #ls -l
+      # Debug step to verify repository contents
+      - name: Verify repository contents
+        run: |
+          echo "Listing root directory:"
+          #ls -l
           
-  #         echo "Listing k8s directory:"
-  #         ls -l ./k8s/
+          echo "Listing k8s directory:"
+          ls -l ./k8s/
 
-  #     # Deploy to AKS
-  #     - name: Deploy to AKS
-  #       run: |
-  #         kubectl apply -f ./k8s/deployment.yaml
-  #         kubectl apply -f ./k8s/service.yaml
-  #         kubectl rollout status deployment/backend-deployment
-        deploy:
-         needs: build
-  runs-on: ubuntu-latest
-
-  steps:
-    # Set up kubectl for interacting with the AKS cluster
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v1
-      with:
-        kubeconfig: ${{ secrets.AKS_KUBECONFIG }}
-
-    # Debug step to verify repository contents and verify if the k8s folder exists
-    - name: Verify repository contents
-      run: |
-        echo "Listing root directory:"
-        ls -l  # List the files in the root directory to ensure the repository is properly checked out
+      # Deploy to AKS
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f ./k8s/deployment.yaml
+          kubectl apply -f ./k8s/service.yaml
+          kubectl rollout status deployment/backend-deployment
         
-        echo "Listing k8s directory:"
-        ls -l ./k8s/  # List the files in the k8s directory to confirm the YAML files are there
-
-    # List all pods across all namespaces in the AKS cluster
-    - name: List all pods in all namespaces
-      run: |
-        echo "Listing all pods across all namespaces:"
-        kubectl get pods --all-namespaces  # This will show all pods across namespaces
-
-    # Deploy to AKS using kubectl
-    - name: Deploy to AKS
-      run: |
-        kubectl apply -f ./k8s/deployment.yaml  # Apply the deployment YAML
-        kubectl apply -f ./k8s/service.yaml     # Apply the service YAML
-        kubectl rollout status deployment/backend-deployment  # Wait for the deployment to finish
-
- 
