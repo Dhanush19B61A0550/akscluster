@@ -10,5 +10,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80          # External port for the service (exposed externally)
-      targetPort: 8082   # The internal port your app listens on inside the container
+      targetPort: 8081   # The internal port your app listens on inside the container
   type: LoadBalancer

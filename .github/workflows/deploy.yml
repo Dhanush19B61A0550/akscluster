@@ -34,8 +34,8 @@ jobs:
         id: build-image
         run: |
           IMAGE_TAG=$(git rev-parse --short HEAD)
-          docker build -t emsregistery.azurecr.io/dhanasekhar716/ipll:latest .
-          docker push emsregistery.azurecr.io/dhanasekhar716/ipll:latest
+          docker build -t emsregistery.azurecr.io/dhanasekhar716/iplll:latest .
+          docker push emsregistery.azurecr.io/dhanasekhar716/iplll:latest
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
  
     outputs:

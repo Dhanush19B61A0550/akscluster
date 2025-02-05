@@ -16,9 +16,9 @@ spec:
     spec:
       containers:
         - name: backend-container
-          image: emsregistery.azurecr.io/dhanasekhar716/ipll:latest  # Replace with your image and tag
+          image: emsregistery.azurecr.io/dhanasekhar716/iplll:latest  # Replace with your image and tag
           ports:
-            - containerPort: 8082  # Make sure this matches the port your app listens on
+            - containerPort: 8081  # Make sure this matches the port your app listens on
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"  # If you're using Spring profiles, set it as per your needs
@@ -32,12 +32,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health  # Example for Spring Boot apps, adjust as needed
-              port: 8082
+              port: 8081
             initialDelaySeconds: 10
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /actuator/health  # Example for Spring Boot apps, adjust as needed
-              port: 8082
+              port: 8081
             initialDelaySeconds: 5
             periodSeconds: 20
