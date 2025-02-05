@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend-container
-          image: emsregistery.azurecr.io/dhanasekhar716/backendss:latest  # Replace with your image and tag
+          image: emsregistery.azurecr.io/dhanasekhar716/teja:latest  # Replace with your image and tag
           ports:
             - containerPort: 8081  # Make sure this matches the port your app listens on
           env:

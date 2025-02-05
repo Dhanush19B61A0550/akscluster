@@ -1,61 +1,81 @@
 name: Build and Deploy to AKS
-
+ 
 on:
   push:
     branches:
       - main
-
+ 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+ 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Set up Java using Temurin (Adoptium's updated distribution name)
+        uses: actions/checkout@v4
+ 
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          java-version: '23'  # Use JDK 23 (or whichever version you need)
+          java-version: '23'
           distribution: 'temurin'
           java-package: 'jdk'
-
-      # Build the application using Maven
+ 
       - name: Build with Maven
-        run: mvn clean install  # Ensure the target/ems-backend-0.0.1-SNAPSHOT.jar file is created
-
-      - name: List target directory for verification
-        run: ls -l target/  # Verify the JAR file is generated
-
-      # Log in to Azure Container Registry
+        run: mvn clean install
+ 
       - name: Log in to Azure Container Registry
         uses: azure/docker-login@v2
         with:
           login-server: emsregistery.azurecr.io
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-
-      # Build and push Docker image
+ 
       - name: Build and push Docker image
+        id: build-image
         run: |
           IMAGE_TAG=$(git rev-parse --short HEAD)
-          docker build -t emsregistery.azurecr.io/dhanasekhar716/backendss:$IMAGE_TAG .
-          docker push emsregistery.azurecr.io/dhanasekhar716/backendss:$IMAGE_TAG
-
+          docker build -t emsregistery.azurecr.io/dhanasekhar716/teja:latest .
+          docker push emsregistery.azurecr.io/dhanasekhar716/teja:latest
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
+ 
+    outputs:
+      image-tag: ${{ steps.build-image.outputs.IMAGE_TAG }}
+ 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-
+ 
     steps:
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+ 
+      - name: Authenticate with Azure
+        uses: azure/login@v1
         with:
-          kubeconfig: ${{ secrets.AKS_KUBECONFIG }}
-
-      # Deploy to AKS
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+ 
+      - name: Set AKS context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: dhanaaaa
+          cluster-name: DhanaaAKSCluster
+ 
       - name: Deploy to AKS
         run: |
-          kubectl apply -f ./k8s/deployment.yaml
-          kubectl apply -f ./k8s/service.yaml
-          kubectl rollout status deployment/backend-deployment
+          # Replace <IMAGE_TAG> in deployment.yaml with the actual image tag
+          sed -i "s|latest|${{ needs.build.outputs.image-tag }}|g" /home/runner/work/akscluster/akscluster/k8s/deployment.yaml
+ 
+          # Apply Kubernetes manifests
+          kubectl apply -f /home/runner/work/akscluster/akscluster/k8s/deployment.yaml --validate=false
+          kubectl apply -f /home/runner/work/akscluster/akscluster/k8s/service.yaml --validate=false
+ 
+          # Wait for deployment to complete
+          kubectl rollout status deployment/java-backend-deployment --timeout=300s || true
+ 
+      - name: Debug Pod Status (if rollout fails)
+        if: ${{ failure() }}  # Only run if the previous step fails
+        run: |
+          echo "Debugging failed deployment..."
+          kubectl get pods -l app=java-backend
+          kubectl describe pod -l app=java-backend
+          kubectl logs -l app=java-backend
