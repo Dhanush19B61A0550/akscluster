@@ -1,43 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-deployment
-  labels:
-    app: backend
+  name: spring-boot-app
 spec:
-  replicas: 2  # Number of pods you want to run (scale as needed)
+  replicas: 2
   selector:
     matchLabels:
-      app: backend
+      app: spring-boot-app
   template:
     metadata:
       labels:
-        app: backend
+        app: spring-boot-app
     spec:
       containers:
-        - name: backend-container
-          image: emsregistery.azurecr.io/dhanasekhar716/iplll:latest  # Replace with your image and tag
-          ports:
-            - containerPort: 8081  # Make sure this matches the port your app listens on
-          env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: "prod"  # If you're using Spring profiles, set it as per your needs
-          resources:
-            limits:
-              memory: "1Gi"
-              cpu: "1"
-            requests:
-              memory: "512Mi"
-              cpu: "0.5"
-          livenessProbe:
-            httpGet:
-              path: /actuator/health  # Example for Spring Boot apps, adjust as needed
-              port: 8081
-            initialDelaySeconds: 10
-            periodSeconds: 30
-          readinessProbe:
-            httpGet:
-              path: /actuator/health  # Example for Spring Boot apps, adjust as needed
-              port: 8081
-            initialDelaySeconds: 5
-            periodSeconds: 20
+      - name: spring-boot-app
+        image: dhanasekhar716/iplll:latest
+        ports:
+        - containerPort: 8081
