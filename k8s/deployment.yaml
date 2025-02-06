@@ -16,4 +16,4 @@ spec:
       - name: spring-boot-app
         image: emsregistery.azurecr.io/dhanasekhar716/ipllll:latest
         ports:
-        - containerPort: 8083
+        - containerPort: 8082
