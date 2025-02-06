@@ -41,3 +41,4 @@ jobs:
         az aks get-credentials --resource-group dhanaaaa --name DhanaaAKSCluster
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
+        #
